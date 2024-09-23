@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Weather App</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="card">
+            <div class="search">
+                <input type="text" placeholder="Enter a city" spellcheck="false" />
+                <button onclick="fetchWeather()"><img src="images/search.png" /></button>
+            </div>
+
+            <div class="weather">
+                <img class="weather-img" src="images/clouds.png" />
+                <h1 class="temp">22°C</h1>
+                <h2 class="city">Mumbai</h2>
+
+                <div class="details">
+                    <div class="col">
+                        <img class="humidity-img" src="images/humidity.png" />
+                        <div>
+                            <p class="humidity">50%</p>
+                            <p>Humidity</p>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <img class="wind-img" src="images/wind.png" />
+                        <div>
+                            <p class="wind">15 km/h</p>
+                            <p>Wind Speed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        const apiKey      = "86a97a5d403a6fef736aeb6c461b0d31";
+        const units       = "metric";
+        const weatherIcon = document.querySelector(".weather-img");
+
+        async function fetchWeather() {
+            const city   = document.querySelector(".search input").value;
+            if(!city) {
+                alert("Please Enter a City!");
+                return;
+            }
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${units}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    alert("City not found!");
+                    return;
+                }
+                const data = await response.json();
+
+                updateWeatherDetails(data);
+
+            } catch (error) {
+                console.error("Error fetching weather data:", error);
+                alert("Failed to fetch weather data. Please try again later.");
+            }
+        }
+
+        const updateWeatherDetails = (data) => {
+            document.querySelector(".city")    .innerHTML = data.name;
+            document.querySelector(".temp")    .innerHTML = Math.round(data.main.temp) + "°C";
+            document.querySelector(".humidity").innerHTML = data.main.humidity         + "%";
+            document.querySelector(".wind")    .innerHTML = data.wind.speed            + " km/h";
+
+            if(data.weather[0].main == "Clear"){
+                weatherIcon.src = "images/clear.png"
+            } else if(data.weather[0].main == "Clouds"){
+                weatherIcon.src = "images/clouds.png"
+            } else if(data.weather[0].main == "Drizzle"){
+                weatherIcon.src = "images/drizzle.png"
+            } else if(data.weather[0].main == "Mist"){
+                weatherIcon.src = "images/mist.png"
+            } else if(data.weather[0].main == "Rain"){
+                weatherIcon.src = "images/rain.png"
+            } else if(data.weather[0].main == "Snow"){
+                weatherIcon.src = "images/snow.png"
+            }
+        }
+
+        window.onload = () => {
+            document.querySelector(".search input").value = "Mumbai";
+            fetchWeather();
+            document.querySelector(".search input").value = "";
+        }
+
+    </script>
+</html>
